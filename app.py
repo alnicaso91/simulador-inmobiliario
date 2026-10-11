@@ -33,10 +33,8 @@ def calcular_hipoteca_con_gracia(monto_credito, tasa_anual, plazo_anios, meses_g
     return cuota
 
 def estimar_gastos_operacionales(monto_credito_uf, estado_propiedad):
-    # 0.2% solo si es Nuevo CON DFL-2. Si es Nuevo SIN DFL-2 o Usado, aplica 0.8%
     tasa_impuesto = 0.002 if estado_propiedad == "Nuevo (Con beneficios DFL-2)" else 0.008
     impuesto_mutuo = monto_credito_uf * tasa_impuesto
-    
     gastos_fijos_banco_uf = 18 
     return impuesto_mutuo + gastos_fijos_banco_uf
 
@@ -87,7 +85,6 @@ def generar_prospecto_avanzado(proposito, ubicacion, distribucion, estado, finan
         ]
         doc.add_paragraph(f"\nRentabilidad Bruta Anual (Cap Rate): {cap_rate:.2f}%")
     else:
-        # Si es para vivir, no hay arriendo, es puro costo.
         datos_flujo = [
             ("Dividendo Mensual (Costo Vivienda)", f"$ {dividendo:,.0f}"),
             ("Gastos Operacionales Iniciales a cubrir", f"$ {g_operacionales:,.0f}")
@@ -115,14 +112,23 @@ st.subheader("1. Características del Activo")
 c1, c2, c3 = st.columns(3)
 with c1:
     ubicacion = st.text_input("Ubicación", "Metro Rodrigo de Araya, Santiago")
-    distribucion = st.selectbox("Distribución", ["Estudio", "1D1B", "2D1B", "2D2B", "3D1B"])
+    distribucion = st.selectbox("Distribución", [
+        "Estudio", 
+        "1D1B", 
+        "2D1B", 
+        "2D2B", 
+        "3D1B", 
+        "3D2B", 
+        "3D3B", 
+        "Mariposa 2D2B", 
+        "Mariposa 3D2B"
+    ])
 with c2:
     estado_propiedad = st.radio("Estado de la Propiedad", [
         "Nuevo (Con beneficios DFL-2)", 
         "Nuevo (Sin DFL-2)", 
         "Usado (Trato Directo / Corredor)"
     ])
-    # FOGAES o Bono Pie aplica a propiedades nuevas, sin importar si tienen DFL-2 o no
     if "Nuevo" in estado_propiedad:
         financiamiento = st.selectbox("Apoyo Estatal / Inmobiliaria", ["Ninguno", "FOGAES (10% Garantía)", "Bono Pie (10% - 15%)"])
     else:
